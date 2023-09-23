@@ -9,9 +9,16 @@ import matplotlib.pyplot as plt
 
 input_folder = 'input_imgs'
 
+#chang input
+use_inp = 1
+
 # read input image
-#img = cv.imread(os.path.join(input_folder, 'road1.jpg'))
-img = cv.imread(os.path.join(input_folder, 'img_x.png'))
+img = None
+if use_inp == 0:
+    img = cv.imread(os.path.join(input_folder, 'road1.jpg'))
+elif use_inp == 1:
+    img = cv.imread(os.path.join(input_folder, 'img_x.png'))
+
 img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
 img = cv.medianBlur(img, 5)
 
