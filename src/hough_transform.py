@@ -45,8 +45,8 @@ plt.show()
 # all maxima, where loads od curves intersect should correspod to a good line guess in the image
 
 #define backed size and create hough space
-angle_step= 0.5 # all 0.5 degree
-distance_step = 3 # like 3 pixel
+angle_step= 1 # all 1 degree
+distance_step = 4 # like 3 pixel
 diag = int(np.sqrt(img_h**2 + img_w**2))
 hough_space_h = int(diag/distance_step)
 hough_space_w = int(180/angle_step)
@@ -61,10 +61,10 @@ for x in range(0, img_h):
             # we have an edge pixel
             # now for every possible θ we compute the corresponding r
             # and increase the hough space value
-            for theta in np.arange (0, 180, angle_step) :
+            for theta in np.arange (-90, 90, angle_step) :
                 r = x * np.cos(theta/180*np.pi) + y * np.sin(theta/180*np.pi)
                 if (r < diag):
-                    hough_space[int(r/distance_step), int(theta/angle_step)] += 1
+                    hough_space[int(r/distance_step), int(theta/angle_step)+90] += 1
 
 # now lets have a look at the hough space
 plt.imshow(hough_space)
@@ -77,20 +77,24 @@ max_count = 2
 max_idxs = np.argsort((-hough_space).flatten())
 idxs = []
 cnt = 0
-while max_count > 0:
-    w = int(max_idxs[0] / hough_space_w)
-    h = max_idxs[0] % hough_space_w
+while cnt < max_count:
+    w = int(max_idxs[cnt] / hough_space_w)
+    h = max_idxs[cnt] % hough_space_w
     idxs.append((w,h))
-    theta = h * angle_step / 180*np.pi
+    theta = (h-90) * angle_step / 180*np.pi
     r = w * distance_step
 
     #xcosθ+ysinθ=r -> y = (r-xcosθ)/sinθ
-    start_point = np.array((0, int((r)/np.sin(theta))))
-    end_point = np.array((img_h, int((r-img_h*np.cos(theta))/np.sin(theta))))
+    start_point = np.array((int((r)/np.sin(theta)),0))
+    end_point = np.array((int((r-img_w*np.cos(theta))/np.sin(theta)), img_w))
 
     cv.line(img, start_point, end_point, (255,0,0), 2)
+    cnt+=1
 
-    max_count-=1
+# result these lines are still infinit, a possibility would be to check back where edge points where,
+# to limit the length. However, this is also a really good thing with this algorithm,
+# imagine a line or a circle which is partly hidden, here we would also calculate the hidden parts
+#
 
 plt.imshow(img)
 plt.show()
