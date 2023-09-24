@@ -9,15 +9,10 @@ import matplotlib.pyplot as plt
 
 input_folder = 'input_imgs'
 
-#chang input
-use_inp = 1
-
 # read input image
 img = None
-if use_inp == 0:
-    img = cv.imread(os.path.join(input_folder, 'road1.jpg'))
-elif use_inp == 1:
-    img = cv.imread(os.path.join(input_folder, 'img_x.png'))
+
+img = cv.imread(os.path.join(input_folder, 'img_x.png'))
 
 img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
 img = cv.medianBlur(img, 5)
@@ -106,4 +101,28 @@ while cnt < max_count:
 plt.imshow(img)
 plt.show()
 
-print('fin')
+print('fin self implemented')
+
+#or simply use the openCV stuff
+img = cv.imread(os.path.join(input_folder, 'road1.jpg'))
+img = cv.medianBlur(img, 5)
+img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+plt.imshow(img)
+plt.show()
+
+#do some edge detection
+edge_img = cv.Canny(img,190,200)
+plt.imshow(edge_img)
+plt.show()
+
+# Detect points that form a line
+lines = cv.HoughLinesP(edge_img, 1, np.pi/180, 68, minLineLength=25, maxLineGap=20)
+#lines = cv2.HoughLinesP(edges, 1, np.pi/180, minLineLength=10, maxLineGap=250)
+# Draw lines on the image
+for line in lines:
+   x1, y1, x2, y2 = line[0]
+   cv.line(img, (x1, y1), (x2, y2), (255, 0, 0), 3)
+
+#result with cv
+plt.imshow(img)
+plt.show()
